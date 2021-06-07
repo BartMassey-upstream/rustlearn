@@ -7,38 +7,34 @@
 //! This script downloads the data, transforms it into `rustlearn` matrices, and fits several classification models.
 #![allow(non_snake_case)]
 
+use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
-use std::fs::File;
 
 extern crate hyper;
 
 extern crate rustlearn;
 
-use rustlearn::prelude::*;
-use rustlearn::linear_models::sgdclassifier;
-use rustlearn::trees::decision_tree;
 use rustlearn::ensemble::random_forest;
+use rustlearn::linear_models::sgdclassifier;
 use rustlearn::metrics;
+use rustlearn::prelude::*;
+use rustlearn::trees::decision_tree;
 
 use hyper::client::Client;
 
-
 fn download_data(url: &str) -> Result<String, hyper::error::Error> {
-
     let client = Client::new();
 
     let mut output = String::new();
 
-    let mut response = try!(client.get(url).send());
-    try!(response.read_to_string(&mut output));
+    let mut response = client.get(url).send()?;
+    response.read_to_string(&mut output)?;
 
     Ok(output)
 }
 
-
 fn get_raw_data(url: &str, filename: &str) -> String {
-
     let path = Path::new(filename);
 
     let raw_data = match File::open(&path) {
@@ -49,7 +45,7 @@ fn get_raw_data(url: &str, filename: &str) -> String {
             file.write_all(file_data.as_bytes()).unwrap();
 
             file_data
-        },
+        }
         Ok(mut file) => {
             println!("Reading data for {}", filename);
             let mut file_data = String::new();
@@ -61,9 +57,7 @@ fn get_raw_data(url: &str, filename: &str) -> String {
     raw_data
 }
 
-
 fn build_x_matrix(data: &str) -> SparseRowArray {
-
     let mut coo = Vec::new();
 
     for (row, line) in data.lines().enumerate() {
@@ -85,11 +79,9 @@ fn build_x_matrix(data: &str) -> SparseRowArray {
     array
 }
 
-
 fn build_y_array(data: &str) -> Array {
-
     let mut y = Vec::new();
-    
+
     for line in data.lines() {
         for datum_str in line.split_whitespace() {
             let datum = datum_str.parse::<i32>().unwrap();
@@ -97,17 +89,17 @@ fn build_y_array(data: &str) -> Array {
         }
     }
 
-    Array::from(y.iter().map(|&x| 
-                             match x {
-                                 -1 => 0.0,
-                                 _ => 1.0,
-                             }
-    ).collect::<Vec<f32>>())
+    Array::from(
+        y.iter()
+            .map(|&x| match x {
+                -1 => 0.0,
+                _ => 1.0,
+            })
+            .collect::<Vec<f32>>(),
+    )
 }
 
-
 fn get_train_data() -> (SparseRowArray, SparseRowArray) {
-
     let X_train = build_x_matrix(&get_raw_data("https://archive.ics.uci.edu/ml/machine-learning-databases/dorothea/DOROTHEA/dorothea_train.data",
                                                "./examples/dorothea_train.data"));
     let X_test = build_x_matrix(&get_raw_data("https://archive.ics.uci.edu/ml/machine-learning-databases/dorothea/DOROTHEA/dorothea_valid.data",
@@ -116,22 +108,25 @@ fn get_train_data() -> (SparseRowArray, SparseRowArray) {
     (X_train, X_test)
 }
 
-
 fn get_target_data() -> (Array, Array) {
-
     let y_train = build_y_array(&get_raw_data("https://archive.ics.uci.edu/ml/machine-learning-databases/dorothea/DOROTHEA/dorothea_train.labels",
                                               "./examples/dorothea_train.labels"));
-    let y_test = build_y_array(&get_raw_data("https://archive.ics.uci.edu/ml/machine-learning-databases/dorothea/dorothea_valid.labels",
-                                             "./examples/dorothea_valid.labels"));
+    let y_test = build_y_array(&get_raw_data(
+        "https://archive.ics.uci.edu/ml/machine-learning-databases/dorothea/dorothea_valid.labels",
+        "./examples/dorothea_valid.labels",
+    ));
 
     (y_train, y_test)
 }
 
-
-fn run_sgdclassifier(X_train: &SparseRowArray, X_test: &SparseRowArray, y_train: &Array, y_test: &Array) {
-
+fn run_sgdclassifier(
+    X_train: &SparseRowArray,
+    X_test: &SparseRowArray,
+    y_train: &Array,
+    y_test: &Array,
+) {
     println!("Running SGDClassifier...");
-    
+
     let num_epochs = 10;
 
     let mut model = sgdclassifier::Hyperparameters::new(X_train.cols())
@@ -149,54 +144,64 @@ fn run_sgdclassifier(X_train: &SparseRowArray, X_test: &SparseRowArray, y_train:
     println!("SGDClassifier accuracy: {}", accuracy);
 }
 
-
-fn run_decision_tree(X_train: &SparseRowArray, X_test: &SparseRowArray, y_train: &Array, y_test: &Array) {
-
+fn run_decision_tree(
+    X_train: &SparseRowArray,
+    X_test: &SparseRowArray,
+    y_train: &Array,
+    y_test: &Array,
+) {
     println!("Running DecisionTree...");
 
     let X_train = SparseColumnArray::from(X_train);
     let X_test = SparseColumnArray::from(X_test);
 
-    let mut model = decision_tree::Hyperparameters::new(X_train.cols())
-        .build();
+    let mut model = decision_tree::Hyperparameters::new(X_train.cols()).build();
 
     model.fit(&X_train, y_train).unwrap();
-    
+
     let predictions = model.predict(&X_test).unwrap();
     let accuracy = metrics::accuracy_score(y_test, &predictions);
 
     println!("DecisionTree accuracy: {}", accuracy);
 }
 
-
-fn run_random_forest(X_train: &SparseRowArray, X_test: &SparseRowArray, y_train: &Array, y_test: &Array) {
-
+fn run_random_forest(
+    X_train: &SparseRowArray,
+    X_test: &SparseRowArray,
+    y_train: &Array,
+    y_test: &Array,
+) {
     println!("Running RandomForest...");
 
     let num_trees = 10;
 
     let tree_params = decision_tree::Hyperparameters::new(X_train.cols());
-    let mut model = random_forest::Hyperparameters::new(tree_params, num_trees)
-        .build();
-                                                   
+    let mut model = random_forest::Hyperparameters::new(tree_params, num_trees).build();
+
     model.fit(X_train, y_train).unwrap();
-    
+
     let predictions = model.predict(X_test).unwrap();
     let accuracy = metrics::accuracy_score(y_test, &predictions);
 
     println!("RandomForest accuracy: {}", accuracy);
 }
 
-
 fn main() {
-
     let (X_train, X_test) = get_train_data();
     let (y_train, y_test) = get_target_data();
 
-    println!("Training data: {} by {} matrix with {} nonzero entries",
-             X_train.rows(), X_train.cols(), X_train.nnz());
-    println!("Test data: {} by {} matrix with {} nonzero entries",
-             X_test.rows(), X_test.cols(), X_test.nnz());
+    println!(
+        "Training data: {} by {} matrix with {} nonzero entries",
+        X_train.rows(),
+        X_train.cols(),
+        X_train.nnz()
+    );
+    println!(
+        "Test data: {} by {} matrix with {} nonzero entries",
+        X_test.rows(),
+        X_test.cols(),
+        X_test.nnz()
+    );
 
     run_sgdclassifier(&X_train, &X_test, &y_train, &y_test);
     run_decision_tree(&X_train, &X_test, &y_train, &y_test);

@@ -16,7 +16,7 @@ exclude = [
 ]
 links = "libsvm"
 build = "build.rs"
-# edition = "2018"
+edition = "2018"
 
 [dependencies]
 rand = "0.8.3"
