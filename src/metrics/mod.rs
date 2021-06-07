@@ -1,6 +1,6 @@
 //! Accuracy metrics.
 
-use array::prelude::*;
+use crate::array::prelude::*;
 
 mod ranking;
 

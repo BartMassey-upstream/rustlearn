@@ -1,6 +1,6 @@
 //! The iris dataset.
 
-use array::dense::*;
+use crate::array::dense::*;
 
 /// Load the iris dataset, returning a tuple of (features, class labels).
 pub fn load_data() -> (Array, Array) {

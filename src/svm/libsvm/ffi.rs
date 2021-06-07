@@ -10,7 +10,7 @@ use std::ffi::CStr;
 use std::os::raw::c_char;
 use std::slice;
 
-use prelude::*;
+use crate::prelude::*;
 
 /// SVM type.
 #[repr(C)]

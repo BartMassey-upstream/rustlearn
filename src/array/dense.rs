@@ -112,7 +112,7 @@
 use std::iter::Iterator;
 use std::ops::Range;
 
-use array::traits::*;
+use crate::array::traits::*;
 
 #[derive(Clone, Copy, Debug)]
 enum ArrayIteratorAxis {

@@ -35,10 +35,10 @@
 
 use std::cmp;
 
-use prelude::*;
+use crate::prelude::*;
 
-use multiclass::OneVsRestWrapper;
-use utils::{
+use crate::multiclass::OneVsRestWrapper;
+use crate::utils::{
     check_data_dimensionality, check_matched_dimensions, check_valid_labels, EncodableRng,
 };
 
@@ -288,12 +288,12 @@ impl FactorizationMachine {
             let slice_start = feature_idx * self.num_components;
             let slice_stop = slice_start + self.num_components;
 
-            let mut component_row =
+            let component_row =
                 &mut self.latent_factors.as_mut_slice()[slice_start..slice_stop];
-            let mut gradsq_row = &mut self.latent_gradsq.as_mut_slice()[slice_start..slice_stop];
-            let mut applied_l2_row =
+            let gradsq_row = &mut self.latent_gradsq.as_mut_slice()[slice_start..slice_stop];
+            let applied_l2_row =
                 &mut self.latent_applied_l2.as_mut_slice()[slice_start..slice_stop];
-            let mut applied_l1_row =
+            let applied_l1_row =
                 &mut self.latent_applied_l1.as_mut_slice()[slice_start..slice_stop];
 
             for (component_value, (gradsq, (applied_l2, (applied_l1, component_sum_value)))) in
@@ -333,7 +333,7 @@ impl FactorizationMachine {
         T: IndexableMatrix,
         &'a T: RowIterable,
     {
-        let mut component_sum = &mut vec![0.0; self.num_components][..];
+        let component_sum = &mut vec![0.0; self.num_components][..];
 
         for (row, &true_y) in X.iter_rows().zip(y.data().iter()) {
             let y_hat = sigmoid(self.compute_prediction(&row, component_sum));
@@ -384,19 +384,19 @@ where
     T: IndexableMatrix,
 {
     fn fit(&mut self, X: &'a T, y: &Array) -> Result<(), &'static str> {
-        try!(check_data_dimensionality(self.dim, X));
-        try!(check_matched_dimensions(X, y));
-        try!(check_valid_labels(y));
+        r#try!(check_data_dimensionality(self.dim, X));
+        r#try!(check_matched_dimensions(X, y));
+        r#try!(check_valid_labels(y));
 
         self.fit_sigmoid(X, y)
     }
 
     fn decision_function(&self, X: &'a T) -> Result<Array, &'static str> {
-        try!(check_data_dimensionality(self.dim, X));
+        r#try!(check_data_dimensionality(self.dim, X));
 
         let mut data = Vec::with_capacity(X.rows());
 
-        let mut component_sum = &mut vec![0.0; self.num_components][..];
+        let component_sum = &mut vec![0.0; self.num_components][..];
 
         for row in X.iter_rows() {
             let prediction = self.compute_prediction(&row, component_sum);
@@ -418,9 +418,9 @@ where
         y: &Array,
         num_threads: usize,
     ) -> Result<(), &'static str> {
-        try!(check_data_dimensionality(self.dim, X));
-        try!(check_matched_dimensions(X, y));
-        try!(check_valid_labels(y));
+        r#try!(check_data_dimensionality(self.dim, X));
+        r#try!(check_matched_dimensions(X, y));
+        r#try!(check_valid_labels(y));
 
         let rows_per_thread = X.rows() / num_threads + 1;
         let num_components = self.num_components;

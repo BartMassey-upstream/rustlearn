@@ -6,7 +6,7 @@
 //! and subject to change.
 use rand::prelude::*;
 
-use prelude::*;
+use crate::prelude::*;
 
 fn default_stdrng() -> StdRng {
     StdRng::from_entropy()

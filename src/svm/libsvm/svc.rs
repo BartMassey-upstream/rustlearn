@@ -19,12 +19,12 @@
 //! let prediction = model.predict(&X).unwrap();
 //! ```
 
-use prelude::*;
+use crate::prelude::*;
 
 use super::ffi;
 pub use super::ffi::KernelType;
 
-use utils::{check_data_dimensionality, check_matched_dimensions};
+use crate::utils::{check_data_dimensionality, check_matched_dimensions};
 
 #[derive(Clone, Serialize, Deserialize)]
 /// Hyperparameters for the SVC model.
@@ -107,18 +107,18 @@ macro_rules! impl_supervised_model {
     ($x_type:ty) => {
         impl<'a> SupervisedModel<&'a $x_type> for SVC {
             fn fit(&mut self, X: &$x_type, y: &Array) -> Result<(), &'static str> {
-                try!(check_data_dimensionality(self.dim, X));
-                try!(check_matched_dimensions(X, y));
+                r#try!(check_data_dimensionality(self.dim, X));
+                r#try!(check_matched_dimensions(X, y));
 
                 let svm_params = self.hyperparams.svm_parameter();
 
-                self.model = Some(try!(ffi::fit(X, y, &svm_params)));
+                self.model = Some(r#try!(ffi::fit(X, y, &svm_params)));
 
                 Ok(())
             }
 
             fn decision_function(&self, X: &$x_type) -> Result<Array, &'static str> {
-                try!(check_data_dimensionality(self.dim, X));
+                r#try!(check_data_dimensionality(self.dim, X));
 
                 match self.model {
                     Some(ref model) => {

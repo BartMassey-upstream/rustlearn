@@ -39,8 +39,8 @@
 use std::iter::Iterator;
 use std::ops::Range;
 
-use array::dense::*;
-use array::traits::*;
+use crate::array::dense::*;
+use crate::array::traits::*;
 
 /// A sparse matrix with entries arranged row-wise.
 #[derive(Serialize, Deserialize)]

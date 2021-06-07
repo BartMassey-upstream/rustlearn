@@ -25,7 +25,7 @@
 
 use std::collections::HashMap;
 
-use prelude::*;
+use crate::prelude::*;
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct DictVectorizer {

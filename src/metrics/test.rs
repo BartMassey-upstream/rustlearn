@@ -25,9 +25,9 @@ mod tests {
 }
 
 mod generated_tests {
-    use metrics::ranking::*;
-    use prelude::*;
-    use super::*;
+    
+    
+    
 
 
     #[test]

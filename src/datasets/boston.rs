@@ -1,6 +1,6 @@
 //! The Boston house prices dataset.
 
-use array::dense::*;
+use crate::array::dense::*;
 
 /// Load the Boston house prices dataset, returning a tuple of (features, class labels).
 ///

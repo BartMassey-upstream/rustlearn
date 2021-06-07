@@ -59,10 +59,10 @@ use std::iter::Iterator;
 
 use crossbeam;
 
-use prelude::*;
+use crate::prelude::*;
 
-use multiclass::OneVsRestWrapper;
-use utils::{check_data_dimensionality, check_matched_dimensions, check_valid_labels};
+use crate::multiclass::OneVsRestWrapper;
+use crate::utils::{check_data_dimensionality, check_matched_dimensions, check_valid_labels};
 
 /// Hyperparameters for a `SGDClassifier` model.
 #[derive(Serialize, Deserialize)]
@@ -203,9 +203,9 @@ macro_rules! min {
 
 impl<'a> SupervisedModel<&'a Array> for SGDClassifier {
     fn fit(&mut self, X: &Array, y: &Array) -> Result<(), &'static str> {
-        try!(check_data_dimensionality(self.dim, X));
-        try!(check_matched_dimensions(X, y));
-        try!(check_valid_labels(y));
+        r#try!(check_data_dimensionality(self.dim, X));
+        r#try!(check_matched_dimensions(X, y));
+        r#try!(check_valid_labels(y));
 
         for (row, &true_y) in X.iter_rows().zip(y.data().iter()) {
             let y_hat = self.compute_prediction(&row);
@@ -221,7 +221,7 @@ impl<'a> SupervisedModel<&'a Array> for SGDClassifier {
     }
 
     fn decision_function(&self, X: &Array) -> Result<Array, &'static str> {
-        try!(check_data_dimensionality(self.dim, X));
+        r#try!(check_data_dimensionality(self.dim, X));
 
         let mut data = Vec::with_capacity(X.rows());
 
@@ -239,7 +239,7 @@ impl<'a> ParallelPredict<&'a Array> for SGDClassifier {
         X: &Array,
         num_threads: usize,
     ) -> Result<Array, &'static str> {
-        try!(check_data_dimensionality(self.dim, X));
+        r#try!(check_data_dimensionality(self.dim, X));
 
         let mut data = Vec::with_capacity(X.rows());
 
@@ -269,9 +269,9 @@ impl<'a> ParallelPredict<&'a Array> for SGDClassifier {
 
 impl<'a> SupervisedModel<&'a SparseRowArray> for SGDClassifier {
     fn fit(&mut self, X: &SparseRowArray, y: &Array) -> Result<(), &'static str> {
-        try!(check_data_dimensionality(self.dim, X));
-        try!(check_matched_dimensions(X, y));
-        try!(check_valid_labels(y));
+        r#try!(check_data_dimensionality(self.dim, X));
+        r#try!(check_matched_dimensions(X, y));
+        r#try!(check_valid_labels(y));
 
         for (row, &true_y) in X.iter_rows().zip(y.data().iter()) {
             let y_hat = self.compute_prediction(&row);
@@ -287,7 +287,7 @@ impl<'a> SupervisedModel<&'a SparseRowArray> for SGDClassifier {
     }
 
     fn decision_function(&self, X: &SparseRowArray) -> Result<Array, &'static str> {
-        try!(check_data_dimensionality(self.dim, X));
+        r#try!(check_data_dimensionality(self.dim, X));
 
         let mut data = Vec::with_capacity(X.rows());
 

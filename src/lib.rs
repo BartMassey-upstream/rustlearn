@@ -179,6 +179,6 @@ pub mod utils;
 #[allow(unused_imports)]
 pub mod prelude {
     //! Basic data structures and traits used throughout `rustlearn`.
-    pub use array::prelude::*;
-    pub use traits::*;
+    pub use crate::array::prelude::*;
+    pub use crate::traits::*;
 }

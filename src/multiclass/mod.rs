@@ -4,11 +4,11 @@ use std::cmp::{Ordering, PartialOrd};
 use std::f32;
 use std::iter::Iterator;
 
-use array::dense::*;
-use array::sparse::*;
-use array::traits::*;
+use crate::array::dense::*;
+use crate::array::sparse::*;
+use crate::array::traits::*;
 
-use traits::*;
+use crate::traits::*;
 
 use crossbeam;
 
@@ -140,7 +140,7 @@ macro_rules! impl_multiclass_supervised_model {
             fn fit(&mut self, X: &'a $t, y: &Array) -> Result<(), &'static str> {
                 for (class_label, binary_target) in OneVsRest::split(y) {
                     let model = self.get_model(class_label);
-                    try!(model.fit(X, &binary_target));
+                    r#try!(model.fit(X, &binary_target));
                 }
                 Ok(())
             }
@@ -149,7 +149,7 @@ macro_rules! impl_multiclass_supervised_model {
                 let mut out = Array::zeros(X.rows(), self.class_labels.len());
 
                 for (col_idx, model) in self.models.iter().enumerate() {
-                    let values = try!(model.decision_function(X));
+                    let values = r#try!(model.decision_function(X));
                     for (row_idx, &val) in values.data().iter().enumerate() {
                         *out.get_mut(row_idx, col_idx) = val;
                     }
@@ -159,7 +159,7 @@ macro_rules! impl_multiclass_supervised_model {
             }
 
             fn predict(&self, X: &'a $t) -> Result<Array, &'static str> {
-                let decision = try!(self.decision_function(X));
+                let decision = r#try!(self.decision_function(X));
                 let mut predictions = Vec::with_capacity(X.rows());
 
                 for row in decision.iter_rows() {
@@ -227,7 +227,7 @@ macro_rules! impl_multiclass_parallel_predict {
                 X: &'a $t,
                 num_threads: usize,
             ) -> Result<Array, &'static str> {
-                let decision = try!(self.decision_function_parallel(X, num_threads));
+                let decision = r#try!(self.decision_function_parallel(X, num_threads));
                 let mut predictions = Vec::with_capacity(X.rows());
 
                 for row in decision.iter_rows() {

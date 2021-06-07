@@ -3,7 +3,7 @@
 use std::f32;
 use std::cmp::{min, Ordering};
 
-use array::prelude::*;
+use crate::array::prelude::*;
 
 
 /// Discounted Cumulative Gain
@@ -155,7 +155,7 @@ fn check_roc_auc_inputs(y_true: &Array, y_hat: &Array) -> Result<(), &'static st
 /// - inputs are empty
 pub fn roc_auc_score(y_true: &Array, y_hat: &Array) -> Result<f32, &'static str> {
 
-    try!(check_roc_auc_inputs(y_true, y_hat));
+    r#try!(check_roc_auc_inputs(y_true, y_hat));
 
     let (tpr, fpr) = rates_at_score(y_true.data(), y_hat.data());
 
