@@ -11,7 +11,7 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
 
-extern crate hyper;
+extern crate reqwest;
 
 extern crate rustlearn;
 
@@ -21,17 +21,8 @@ use rustlearn::metrics;
 use rustlearn::prelude::*;
 use rustlearn::trees::decision_tree;
 
-use hyper::client::Client;
-
-fn download_data(url: &str) -> Result<String, hyper::error::Error> {
-    let client = Client::new();
-
-    let mut output = String::new();
-
-    let mut response = client.get(url).send()?;
-    response.read_to_string(&mut output)?;
-
-    Ok(output)
+fn download_data(url: &str) -> reqwest::Result<String> {
+    reqwest::blocking::get(url)?.text()
 }
 
 fn get_raw_data(url: &str, filename: &str) -> String {
