@@ -158,10 +158,10 @@ impl Hyperparameters {
     fn init_latent_factors_array(&self, rng: &mut EncodableRng) -> Array {
         let mut data = Vec::with_capacity(self.dim * self.num_components);
         let normal =
-            rand_distr::Normal::new(0.0, 1.0 / self.num_components as f64);
+            rand_distr::Normal::new(0.0, 1.0 / self.num_components as f64).unwrap();
 
         for _ in 0..(self.dim * self.num_components) {
-            data.push(normal.ind_sample(&mut rng.rng) as f32)
+            data.push(normal.sample(&mut rng.rng) as f32)
         }
 
         let mut array = Array::from(data);
@@ -429,7 +429,7 @@ where
 
         crossbeam::scope(|scope| {
             for thread_num in 0..num_threads {
-                scope.spawn(move || {
+                scope.spawn(move |_| {
                     let start = thread_num * rows_per_thread;
                     let stop = cmp::min((thread_num + 1) * rows_per_thread, X.rows());
 

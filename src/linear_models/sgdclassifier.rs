@@ -255,7 +255,7 @@ impl<'a> ParallelPredict<&'a Array> for SGDClassifier {
             }
 
             for (&(start, stop), out_chunk) in row_bounds.iter().zip(data_chunks) {
-                scope.spawn(move || {
+                scope.spawn(move |_| {
                     for (row_number, out) in (start..stop).zip(out_chunk) {
                         *out = self.compute_prediction(&X.view_row(row_number));
                     }

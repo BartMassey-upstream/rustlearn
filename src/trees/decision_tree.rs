@@ -74,9 +74,10 @@ impl FeatureIndices {
 
     fn sample_without_replacement(&mut self, to: &mut Vec<usize>, number: usize, rng: &mut StdRng) {
         let from = &mut self.candidate_indices[self.num_used..];
+        let nfrom = from.len();
 
         for num_sampled in 0..number {
-            let idx = (num_sampled..from.len()).ind_sample(rng);
+            let idx = rng.gen_range(num_sampled..nfrom);
 
             let sampled_feature = from[idx];
             let swapped_feature = from[num_sampled];
@@ -1309,7 +1310,7 @@ mod bench {
         let rows = 100;
         let cols = 5000;
 
-        let mut rng = StdRng::new().unwrap();
+        let mut rng = StdRng::from_entropy();
 
         let mut X = Array::from(
             (0..(rows * cols))
@@ -1339,7 +1340,7 @@ mod bench {
         let rows = 5000;
         let cols = 10;
 
-        let mut rng = StdRng::new().unwrap();
+        let mut rng = StdRng::from_entropy();
 
         let mut X = Array::from(
             (0..(rows * cols))
@@ -1369,7 +1370,7 @@ mod bench {
         let rows = 100;
         let cols = 5000;
 
-        let mut rng = StdRng::new().unwrap();
+        let mut rng = StdRng::from_entropy();
 
         let mut X = Array::from(
             (0..(rows * cols))
@@ -1404,7 +1405,7 @@ mod bench {
         let rows = 5000;
         let cols = 100;
 
-        let mut rng = StdRng::new().unwrap();
+        let mut rng = StdRng::from_entropy();
 
         let mut X = Array::from(
             (0..(rows * cols))

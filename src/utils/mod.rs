@@ -9,7 +9,7 @@ use rand::prelude::*;
 use prelude::*;
 
 fn default_stdrng() -> StdRng {
-    StdRng::new().unwrap()
+    StdRng::from_entropy()
 }
 
 /// Wrapper for making random number generators serializable.
@@ -25,7 +25,7 @@ pub struct EncodableRng {
 impl EncodableRng {
     pub fn new() -> EncodableRng {
         EncodableRng {
-            rng: StdRng::new().unwrap(),
+            rng: StdRng::from_entropy(),
         }
     }
 }

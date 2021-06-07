@@ -48,9 +48,9 @@ impl CrossValidation {
         assert!(n_folds > 1, "Number of folds must be greater than one");
 
         let mut indices = (0..n_samples).collect::<Vec<_>>();
-        let mut rng = StdRng::new().unwrap();
+        let mut rng = StdRng::from_entropy();
 
-        rng.shuffle(&mut indices);
+        indices.shuffle(&mut rng);
 
         CrossValidation {
             n_samples: n_samples,
@@ -67,7 +67,7 @@ impl CrossValidation {
         self.rng = rng;
 
         self.indices = (0..self.n_samples).collect::<Vec<_>>();
-        self.rng.shuffle(&mut self.indices);
+        self.indices.shuffle(&mut self.rng);
     }
 }
 

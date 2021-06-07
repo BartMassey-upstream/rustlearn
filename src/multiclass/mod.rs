@@ -197,24 +197,26 @@ macro_rules! impl_multiclass_parallel_predict {
                 let numbered_models = self.models.iter().enumerate().collect::<Vec<_>>();
 
                 for slc in numbered_models.chunks(num_threads) {
-                    let mut guards = Vec::new();
-
-                    crossbeam::scope(|scope| {
+                    out = crossbeam::scope(|scope| {
+                        let mut guards = Vec::new();
                         for &(col_idx, model) in slc {
-                            guards.push(scope.spawn(move || (col_idx, model.decision_function(X))));
+                            guards.push(scope.spawn(move |_| (col_idx, model.decision_function(X))));
                         }
-                    });
 
-                    for guard in guards.into_iter() {
-                        let (col_idx, res) = guard.join();
-                        if res.is_ok() {
-                            for (row_idx, &value) in res.unwrap().as_slice().iter().enumerate() {
-                                out.set(row_idx, col_idx, value);
+
+                        for guard in guards.into_iter() {
+                            let (col_idx, res) = guard.join().unwrap();
+                            if res.is_ok() {
+                                for (row_idx, &value) in res.unwrap().as_slice().iter().enumerate() {
+                                    out.set(row_idx, col_idx, value);
+                                }
+                            } else {
+                                return res;
                             }
-                        } else {
-                            return res;
                         }
-                    }
+                        
+                        Ok(out)
+                    }).unwrap()?;
                 }
 
                 Ok(out)
@@ -268,28 +270,30 @@ macro_rules! impl_multiclass_parallel_supervised {
                         break;
                     }
 
-                    let mut guards = Vec::new();
-
                     crossbeam::scope(|scope| {
+                        let mut guards = Vec::new();
+
                         for (class_label, binary_target) in chunk {
                             let mut model = self.extract_model(class_label);
-                            guards.push(scope.spawn(move || {
+                            guards.push(scope.spawn(move |_| {
                                 let result = model.fit(X, &binary_target);
                                 (class_label, model, result)
                             }));
                         }
-                    });
 
-                    for guard in guards.into_iter() {
-                        let (class_label, model, result) = guard.join();
+                        for guard in guards.into_iter() {
+                            let (class_label, model, result) = guard.join().unwrap();
 
-                        if result.is_ok() {
-                            self.class_labels.push(class_label);
-                            self.models.push(model);
-                        } else {
-                            return result;
+                            if result.is_ok() {
+                                self.class_labels.push(class_label);
+                                self.models.push(model);
+                            } else {
+                                return result;
+                            }
                         }
-                    }
+
+                        Ok(())
+                    });
                 }
 
                 Ok(())

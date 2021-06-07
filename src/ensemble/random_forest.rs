@@ -39,6 +39,7 @@ use multiclass::OneVsRestWrapper;
 use utils::EncodableRng;
 
 use rand::prelude::*;
+use rand::distributions::Uniform;
 
 #[derive(Serialize, Deserialize)]
 pub struct Hyperparameters {
@@ -76,14 +77,14 @@ impl Hyperparameters {
         for _ in 0..self.num_trees {
             // Reseed trees to introduce randomness,
             // without this they are just copies of each other
-            let range = 0..usize::MAX;
+            let range = Uniform::new(0, u8::MAX);
 
             let mut hyperparams = self.tree_hyperparameters.clone();
-            hyperparams.rng(SeedableRng::from_seed(
-                &(0..10)
-                    .map(|_| range.ind_sample(&mut rng.rng))
-                    .collect::<Vec<_>>()[..],
-            ));
+            let mut seed = [0; 32];
+            for s in seed.iter_mut() {
+                *s = rng.rng.sample(range);
+            }
+            hyperparams.rng(SeedableRng::from_seed(seed));
 
             trees.push(hyperparams.build());
         }
@@ -172,10 +173,10 @@ impl RandomForest {
     }
 
     fn bootstrap_indices(num_indices: usize, rng: &mut StdRng) -> Vec<usize> {
-        let range = 0..num_indices;
+        let range = Uniform::new(0, num_indices - 1);
 
         (0..num_indices)
-            .map(|_| range.ind_sample(rng))
+            .map(|_| rng.sample(range))
             .collect::<Vec<_>>()
     }
 }

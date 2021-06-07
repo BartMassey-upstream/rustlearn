@@ -49,7 +49,7 @@ impl ShuffleSplit {
             n: n_samples,
             n_iter: n_iter,
             test_size: test_size,
-            rng: StdRng::new().unwrap(),
+            rng: StdRng::from_entropy(),
             iter: 0,
         }
     }
@@ -61,7 +61,7 @@ impl ShuffleSplit {
 
     fn get_shuffled_indices(&mut self) -> Vec<usize> {
         let mut indices = (0..self.n).collect::<Vec<usize>>();
-        self.rng.shuffle(&mut indices);
+        indices.shuffle(&mut self.rng);
 
         indices
     }
