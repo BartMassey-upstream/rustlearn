@@ -27,15 +27,13 @@
 
 use std::iter::Iterator;
 
-use rand;
-use rand::Rng;
-
+use rand::prelude::*;
 
 pub struct ShuffleSplit {
     n: usize,
     n_iter: usize,
     test_size: f32,
-    rng: rand::StdRng,
+    rng: StdRng,
     iter: usize,
 }
 
@@ -51,13 +49,13 @@ impl ShuffleSplit {
             n: n_samples,
             n_iter: n_iter,
             test_size: test_size,
-            rng: rand::StdRng::new().unwrap(),
+            rng: StdRng::new().unwrap(),
             iter: 0,
         }
     }
 
     /// Set the random number generator.
-    pub fn set_rng(&mut self, rng: rand::StdRng) {
+    pub fn set_rng(&mut self, rng: StdRng) {
         self.rng = rng;
     }
 

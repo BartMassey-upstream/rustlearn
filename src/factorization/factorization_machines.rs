@@ -42,8 +42,7 @@ use utils::{
     check_data_dimensionality, check_matched_dimensions, check_valid_labels, EncodableRng,
 };
 
-use rand;
-use rand::distributions::IndependentSample;
+use rand::prelude::*;
 
 use crossbeam;
 
@@ -123,7 +122,7 @@ impl Hyperparameters {
         self
     }
 
-    pub fn rng(&mut self, rng: rand::StdRng) -> &mut Hyperparameters {
+    pub fn rng(&mut self, rng: StdRng) -> &mut Hyperparameters {
         self.rng.rng = rng;
         self
     }
@@ -158,9 +157,8 @@ impl Hyperparameters {
     /// Initialize the latent factors.
     fn init_latent_factors_array(&self, rng: &mut EncodableRng) -> Array {
         let mut data = Vec::with_capacity(self.dim * self.num_components);
-        // let normal = rand::distributions::normal::Normal::new(0.0, 0.1 / ((self.dim * self.num_components) as f64).sqrt());
         let normal =
-            rand::distributions::normal::Normal::new(0.0, 1.0 / self.num_components as f64);
+            rand_distr::Normal::new(0.0, 1.0 / self.num_components as f64);
 
         for _ in 0..(self.dim * self.num_components) {
             data.push(normal.ind_sample(&mut rng.rng) as f32)

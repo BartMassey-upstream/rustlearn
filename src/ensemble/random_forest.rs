@@ -38,9 +38,7 @@ use trees::decision_tree;
 use multiclass::OneVsRestWrapper;
 use utils::EncodableRng;
 
-use rand;
-use rand::distributions::{IndependentSample, Range};
-use rand::SeedableRng;
+use rand::prelude::*;
 
 #[derive(Serialize, Deserialize)]
 pub struct Hyperparameters {
@@ -64,7 +62,7 @@ impl Hyperparameters {
     }
 
     /// Set the random number generator.
-    pub fn rng(&mut self, rng: rand::StdRng) -> &mut Hyperparameters {
+    pub fn rng(&mut self, rng: StdRng) -> &mut Hyperparameters {
         self.rng.rng = rng;
         self
     }
@@ -78,7 +76,7 @@ impl Hyperparameters {
         for _ in 0..self.num_trees {
             // Reseed trees to introduce randomness,
             // without this they are just copies of each other
-            let range = Range::new(0, usize::MAX);
+            let range = 0..usize::MAX;
 
             let mut hyperparams = self.tree_hyperparameters.clone();
             hyperparams.rng(SeedableRng::from_seed(
@@ -173,8 +171,8 @@ impl RandomForest {
         &self.trees
     }
 
-    fn bootstrap_indices(num_indices: usize, rng: &mut rand::StdRng) -> Vec<usize> {
-        let range = Range::new(0, num_indices);
+    fn bootstrap_indices(num_indices: usize, rng: &mut StdRng) -> Vec<usize> {
+        let range = 0..num_indices;
 
         (0..num_indices)
             .map(|_| range.ind_sample(rng))
@@ -192,7 +190,7 @@ mod tests {
     use metrics::accuracy_score;
     use multiclass::OneVsRestWrapper;
 
-    use rand::{SeedableRng, StdRng};
+    use rand::prelude::*;
 
     use bincode;
     use serde_json;

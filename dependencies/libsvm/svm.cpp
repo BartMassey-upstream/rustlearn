@@ -40,14 +40,10 @@ static inline double powi(double base, int times)
 
 static void print_string_stdout(const char *s)
 {
-    // Function changed to a no-op,
-    // easier than figuring out
-    // how to pass in a function from Rust.
-    // fputs(s,stdout);
-    // fflush(stdout);
+    fputs(s,stdout);
+    fflush(stdout);
 }
 static void (*svm_print_string) (const char *) = &print_string_stdout;
-#if 1
 static void info(const char *fmt,...)
 {
 	char buf[BUFSIZ];
@@ -57,9 +53,6 @@ static void info(const char *fmt,...)
 	va_end(ap);
 	(*svm_print_string)(buf);
 }
-#else
-static void info(const char *fmt,...) {}
-#endif
 
 //
 // Kernel Cache

@@ -42,9 +42,7 @@ use utils::{
     check_data_dimensionality, check_matched_dimensions, check_valid_labels, EncodableRng,
 };
 
-use rand;
-use rand::distributions::{IndependentSample, Range};
-use rand::StdRng;
+use rand::prelude::*;
 
 struct FeatureIndices {
     num_used: usize,
@@ -78,7 +76,7 @@ impl FeatureIndices {
         let from = &mut self.candidate_indices[self.num_used..];
 
         for num_sampled in 0..number {
-            let idx = Range::new(num_sampled, from.len()).ind_sample(rng);
+            let idx = (num_sampled..from.len()).ind_sample(rng);
 
             let sampled_feature = from[idx];
             let swapped_feature = from[num_sampled];
@@ -258,7 +256,7 @@ impl Hyperparameters {
     }
     /// Set the random number generator used for sampling features
     /// to consider at each split.
-    pub fn rng(&mut self, rng: rand::StdRng) -> &mut Hyperparameters {
+    pub fn rng(&mut self, rng: StdRng) -> &mut Hyperparameters {
         self.rng.rng = rng;
         self
     }
@@ -869,7 +867,7 @@ mod tests {
     use metrics::accuracy_score;
     use multiclass::OneVsRestWrapper;
 
-    use rand::{SeedableRng, StdRng};
+    use rand::prelude::*;
 
     use serde_json;
 

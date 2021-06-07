@@ -4,7 +4,7 @@
 //!
 //! Made public to make extending rustlearn easier, but should be treated as semi-public
 //! and subject to change.
-use rand::StdRng;
+use rand::prelude::*;
 
 use prelude::*;
 

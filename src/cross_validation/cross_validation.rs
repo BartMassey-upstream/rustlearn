@@ -25,9 +25,7 @@
 
 use std::iter::Iterator;
 
-use rand;
-use rand::{Rng, StdRng};
-
+use rand::prelude::*;
 
 pub struct CrossValidation {
     n_samples: usize,
@@ -50,7 +48,7 @@ impl CrossValidation {
         assert!(n_folds > 1, "Number of folds must be greater than one");
 
         let mut indices = (0..n_samples).collect::<Vec<_>>();
-        let mut rng = rand::StdRng::new().unwrap();
+        let mut rng = StdRng::new().unwrap();
 
         rng.shuffle(&mut indices);
 
@@ -64,7 +62,7 @@ impl CrossValidation {
     }
 
     /// Fix the random number generator.
-    pub fn set_rng(&mut self, rng: rand::StdRng) {
+    pub fn set_rng(&mut self, rng: StdRng) {
 
         self.rng = rng;
 
