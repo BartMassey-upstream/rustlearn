@@ -38,8 +38,8 @@ use crate::trees::decision_tree;
 use crate::multiclass::OneVsRestWrapper;
 use crate::utils::EncodableRng;
 
-use rand::distributions::Uniform;
 use rand::prelude::*;
+use rand::distributions::Uniform;
 
 #[derive(Serialize, Deserialize)]
 pub struct Hyperparameters {
@@ -183,21 +183,20 @@ impl RandomForest {
 
 #[cfg(test)]
 mod tests {
-    use trees::decision_tree;
+    use crate::trees::decision_tree;
 
     use super::*;
-    use cross_validation::cross_validation::CrossValidation;
-    use datasets::iris::load_data;
-    use metrics::accuracy_score;
-    use multiclass::OneVsRestWrapper;
-
-    use rand::prelude::*;
+    use crate::cross_validation::cross_validation::CrossValidation;
+    use crate::datasets::iris::load_data;
+    use crate::metrics::accuracy_score;
+    use crate::multiclass::OneVsRestWrapper;
+    use crate::utils::std_rng;
 
     use bincode;
     use serde_json;
 
     #[cfg(feature = "all_tests")]
-    use datasets::newsgroups;
+    use crate::datasets::newsgroups;
 
     #[test]
     fn test_random_forest_iris() {
@@ -208,7 +207,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -220,10 +219,10 @@ mod tests {
             tree_params
                 .min_samples_split(10)
                 .max_features(4)
-                .rng(StdRng::from_seed(&[100]));
+                .rng(std_rng());
 
             let mut model = Hyperparameters::new(tree_params, 10)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             model.fit(&x_train, &y_train).unwrap();
@@ -249,7 +248,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -261,10 +260,10 @@ mod tests {
             tree_params
                 .min_samples_split(10)
                 .max_features(4)
-                .rng(StdRng::from_seed(&[100]));
+                .rng(std_rng());
 
             let mut model = Hyperparameters::new(tree_params, 10)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             model.fit_parallel(&x_train, &y_train, 2).unwrap();
@@ -290,7 +289,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = SparseRowArray::from(&data.get_rows(&train_idx));
@@ -302,10 +301,10 @@ mod tests {
             tree_params
                 .min_samples_split(10)
                 .max_features(4)
-                .rng(StdRng::from_seed(&[100]));
+                .rng(std_rng());
 
             let mut model = Hyperparameters::new(tree_params, 10)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             model.fit(&x_train, &y_train).unwrap();
@@ -335,7 +334,7 @@ mod tests {
         let mut train_accuracy = 0.0;
 
         let mut cv = CrossValidation::new(X.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = X.get_rows(&train_idx);
@@ -346,7 +345,7 @@ mod tests {
             let mut tree_params = decision_tree::Hyperparameters::new(X.cols());
             tree_params
                 .min_samples_split(5)
-                .rng(StdRng::from_seed(&[100]));
+                .rng(std_rng());
 
             let mut model = Hyperparameters::new(tree_params, 20).one_vs_rest();
 
@@ -380,7 +379,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -392,10 +391,10 @@ mod tests {
             tree_params
                 .min_samples_split(10)
                 .max_features(4)
-                .rng(StdRng::from_seed(&[100]));
+                .rng(std_rng());
 
             let mut model = Hyperparameters::new(tree_params, 10)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             model.fit(&x_train, &y_train).unwrap();

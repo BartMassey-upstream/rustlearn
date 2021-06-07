@@ -89,8 +89,6 @@ mod tests {
 
     extern crate rand;
 
-    use rand::{SeedableRng, StdRng};
-
     #[test]
     fn iteration() {
         let split = ShuffleSplit::new(100, 4, 0.2);
@@ -124,7 +122,10 @@ mod tests {
 
     #[test]
     fn set_rng() {
-        let seed: &[_] = &[1, 2, 3, 4];
+        let mut seed = [0u8; 32];
+        for i in 1..=4 {
+            seed[i - 1] = i as u8;
+        }
         let rng1: StdRng = SeedableRng::from_seed(seed);
         let rng2: StdRng = SeedableRng::from_seed(seed);
 

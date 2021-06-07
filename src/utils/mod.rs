@@ -12,6 +12,18 @@ fn default_stdrng() -> StdRng {
     StdRng::from_entropy()
 }
 
+#[cfg(test)]
+pub fn std_rng_seed(s: u8) -> StdRng {
+    let mut seed = [0; 32];
+    seed[0] = s;
+    StdRng::from_seed(seed)
+}
+
+#[cfg(test)]
+pub fn std_rng() -> StdRng {
+    std_rng_seed(100)
+}
+
 /// Wrapper for making random number generators serializable.
 /// Does no actual encoding, and merely creates a new
 /// generator on decoding.

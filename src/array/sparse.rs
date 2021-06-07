@@ -507,8 +507,6 @@ impl RowIndex<Vec<usize>> for SparseRowArray {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use array::dense::*;
-    use array::traits::*;
 
     use bincode;
 
@@ -609,7 +607,7 @@ mod tests {
         ));
     }
 
-    use datasets::iris;
+    use crate::datasets::iris;
 
     #[test]
     fn range_iteration() {

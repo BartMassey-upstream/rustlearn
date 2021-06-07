@@ -817,7 +817,6 @@ mod tests {
     use bincode;
 
     use super::*;
-    use array::traits::*;
 
     #[test]
     fn new_from_vec() {
@@ -977,7 +976,7 @@ mod tests {
         }
     }
 
-    use datasets::iris;
+    use crate::datasets::iris;
 
     #[test]
     fn range_iteration() {

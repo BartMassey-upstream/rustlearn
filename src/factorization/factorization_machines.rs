@@ -461,17 +461,14 @@ where
 
 #[cfg(test)]
 mod tests {
-    use rand::{SeedableRng, StdRng};
-
-    use prelude::*;
-
-    use cross_validation::cross_validation::CrossValidation;
-    use datasets::iris::load_data;
-    use metrics::accuracy_score;
-    use multiclass::OneVsRest;
+    use crate::cross_validation::cross_validation::CrossValidation;
+    use crate::datasets::iris::load_data;
+    use crate::metrics::accuracy_score;
+    use crate::multiclass::OneVsRest;
+    use crate::utils::std_rng;
 
     #[cfg(feature = "all_tests")]
-    use datasets::newsgroups;
+    use crate::datasets::newsgroups;
 
     use super::*;
 
@@ -513,7 +510,7 @@ mod tests {
             .learning_rate(0.01)
             .l2_penalty(0.0)
             .l1_penalty(100.0)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .build();
 
         let y = Array::ones(1, 1);
@@ -549,7 +546,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -560,7 +557,7 @@ mod tests {
             let mut model = Hyperparameters::new(data.cols(), 5)
                 .learning_rate(0.05)
                 .l2_penalty(0.0)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             for _ in 0..20 {
@@ -598,7 +595,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -609,7 +606,7 @@ mod tests {
             let mut model = Hyperparameters::new(data.cols(), 5)
                 .learning_rate(0.05)
                 .l2_penalty(0.0)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .build();
 
             for _ in 0..20 {
@@ -643,7 +640,7 @@ mod tests {
         let mut train_accuracy = 0.0;
 
         let mut cv = CrossValidation::new(X.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = X.get_rows(&train_idx);
@@ -653,7 +650,7 @@ mod tests {
 
             let mut model = Hyperparameters::new(X.cols(), 10)
                 .learning_rate(0.005)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             for _ in 0..5 {
@@ -682,11 +679,11 @@ mod tests {
 #[cfg(feature = "bench")]
 #[allow(unused_imports)]
 mod bench {
-    use rand::{SeedableRng, StdRng};
+    use rand::prelude::*;
 
     use test::Bencher;
 
-    use prelude::*;
+    use crate::prelude::*;
 
     use cross_validation::cross_validation::CrossValidation;
     use datasets::iris::load_data;
@@ -705,7 +702,7 @@ mod bench {
         let mut model = Hyperparameters::new(data.cols(), 5)
             .learning_rate(0.05)
             .l2_penalty(0.0)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .one_vs_rest();
 
         b.iter(|| {
@@ -722,7 +719,7 @@ mod bench {
         let target = target.get_rows(&(..500));
 
         let mut model = Hyperparameters::new(X.cols(), 10)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .build();
 
         b.iter(|| {
@@ -739,7 +736,7 @@ mod bench {
         let target = target.get_rows(&(..500));
 
         let mut model = Hyperparameters::new(X.cols(), 10)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .build();
 
         b.iter(|| {

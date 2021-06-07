@@ -154,7 +154,7 @@ pub fn roc_auc_score(y_true: &Array, y_hat: &Array) -> Result<f32, &'static str>
 #[cfg(test)]
 mod tests {
 
-    use prelude::*;
+    use crate::prelude::*;
 
     use super::{counts_at_score, dcg_score, ndcg_score, roc_auc_score};
 
@@ -205,7 +205,7 @@ mod tests {
         let r3 = &Array::from(vec![2.0, 3.0, 5.0]);
         let r4 = &Array::from(vec![0.0, 1.0, 2.0]);
 
-        assert!(close(1.0, ndcg_score(r1, r1, 10)));
+        assert!(close(1.0, ndcg_score(r1, r2, 10)));
         assert!(close(1.0, ndcg_score(r3, r4, 10)));
     }
 

@@ -863,19 +863,18 @@ impl DecisionTree {
 mod tests {
     use super::FeatureValues;
     use super::*;
-    use cross_validation::cross_validation::CrossValidation;
-    use datasets::iris::load_data;
-    use metrics::accuracy_score;
-    use multiclass::OneVsRestWrapper;
-
-    use rand::prelude::*;
+    use crate::cross_validation::cross_validation::CrossValidation;
+    use crate::datasets::iris::load_data;
+    use crate::metrics::accuracy_score;
+    use crate::multiclass::OneVsRestWrapper;
+    use crate::utils::{std_rng, std_rng_seed};
 
     use serde_json;
 
     use bincode;
 
     #[cfg(feature = "all_tests")]
-    use datasets::newsgroups;
+    use crate::datasets::newsgroups;
 
     extern crate time;
 
@@ -1032,7 +1031,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -1043,7 +1042,7 @@ mod tests {
             let mut model = Hyperparameters::new(data.cols())
                 .min_samples_split(5)
                 .max_features(4)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             model.fit(&x_train, &y_train).unwrap();
@@ -1086,7 +1085,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -1097,7 +1096,7 @@ mod tests {
             let mut model = Hyperparameters::new(data.cols())
                 .min_samples_split(2)
                 .max_features(40)
-                .rng(StdRng::from_seed(&[101]))
+                .rng(std_rng_seed(101))
                 .one_vs_rest();
 
             model.fit(&x_train, &y_train).unwrap();
@@ -1123,7 +1122,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = SparseColumnArray::from(&data.get_rows(&train_idx));
@@ -1134,7 +1133,7 @@ mod tests {
             let mut model = Hyperparameters::new(data.cols())
                 .min_samples_split(5)
                 .max_features(4)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             model.fit(&x_train, &y_train).unwrap();
@@ -1160,7 +1159,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -1171,7 +1170,7 @@ mod tests {
             let mut model = Hyperparameters::new(data.cols())
                 .min_samples_split(5)
                 .max_features(4)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             model.fit(&x_train, &y_train).unwrap();
@@ -1211,7 +1210,7 @@ mod tests {
         let mut train_accuracy = 0.0;
 
         let mut cv = CrossValidation::new(X.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = SparseColumnArray::from(&X.get_rows(&train_idx));
@@ -1221,7 +1220,7 @@ mod tests {
 
             let mut model = Hyperparameters::new(X.cols())
                 .min_samples_split(5)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             let start = time::precise_time_ns();
@@ -1255,7 +1254,7 @@ mod tests {
         let mut train_accuracy = 0.0;
 
         let mut cv = CrossValidation::new(X.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = SparseColumnArray::from(&X.get_rows(&train_idx));
@@ -1265,7 +1264,7 @@ mod tests {
 
             let mut model = Hyperparameters::new(X.cols())
                 .min_samples_split(5)
-                .rng(StdRng::from_seed(&[100]))
+                .rng(std_rng())
                 .one_vs_rest();
 
             let start = time::precise_time_ns();
@@ -1295,11 +1294,12 @@ mod tests {
 #[allow(unused_imports)]
 mod bench {
 
-    use prelude::*;
+    use crate::prelude::*;
 
     use super::Hyperparameters;
-    use datasets::iris::load_data;
-    use datasets::newsgroups;
+    use crate::datasets::iris::load_data;
+    use crate::datasets::newsgroups;
+    use crate::utils::std_rng;
 
     use rand::{Rng, SeedableRng, StdRng};
 
@@ -1327,7 +1327,7 @@ mod bench {
 
         let mut model = Hyperparameters::new(cols)
             .min_samples_split(5)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .build();
 
         b.iter(|| {
@@ -1357,7 +1357,7 @@ mod bench {
 
         let mut model = Hyperparameters::new(cols)
             .min_samples_split(5)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .build();
 
         b.iter(|| {
@@ -1392,7 +1392,7 @@ mod bench {
 
         let mut model = Hyperparameters::new(cols)
             .min_samples_split(5)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .build();
 
         b.iter(|| {
@@ -1427,7 +1427,7 @@ mod bench {
 
         let mut model = Hyperparameters::new(cols)
             .min_samples_split(5)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .build();
 
         b.iter(|| {
@@ -1442,7 +1442,7 @@ mod bench {
         let mut model = Hyperparameters::new(data.cols())
             .min_samples_split(5)
             .max_features(4)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .one_vs_rest();
 
         b.iter(|| {
@@ -1459,7 +1459,7 @@ mod bench {
 
         let mut model = Hyperparameters::new(X.cols())
             .min_samples_split(5)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .one_vs_rest();
 
         b.iter(|| {
@@ -1476,7 +1476,7 @@ mod bench {
 
         let mut model = Hyperparameters::new(X.cols())
             .min_samples_split(5)
-            .rng(StdRng::from_seed(&[100]))
+            .rng(std_rng())
             .one_vs_rest();
 
         b.iter(|| {

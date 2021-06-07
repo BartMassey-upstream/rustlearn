@@ -374,21 +374,18 @@ impl SGDClassifier {
 
 #[cfg(test)]
 mod tests {
-    use rand::{SeedableRng, StdRng};
-
-    use prelude::*;
-
-    use cross_validation::cross_validation::CrossValidation;
-    use datasets::iris::load_data;
-    use metrics::accuracy_score;
-    use multiclass::OneVsRestWrapper;
+    use crate::cross_validation::cross_validation::CrossValidation;
+    use crate::datasets::iris::load_data;
+    use crate::metrics::accuracy_score;
+    use crate::multiclass::OneVsRestWrapper;
+    use crate::utils::std_rng;
 
     use super::*;
 
     use bincode;
 
     #[cfg(feature = "all_tests")]
-    use datasets::newsgroups;
+    use crate::datasets::newsgroups;
 
     #[test]
     fn basic_updating() {
@@ -495,7 +492,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -534,7 +531,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -577,7 +574,7 @@ mod tests {
         let no_splits = 10;
 
         let mut cv = CrossValidation::new(data.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = data.get_rows(&train_idx);
@@ -617,7 +614,7 @@ mod tests {
         let mut test_accuracy = 0.0;
 
         let mut cv = CrossValidation::new(X.rows(), no_splits);
-        cv.set_rng(StdRng::from_seed(&[100]));
+        cv.set_rng(std_rng());
 
         for (train_idx, test_idx) in cv {
             let x_train = X.get_rows(&train_idx);

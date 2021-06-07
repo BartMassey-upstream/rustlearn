@@ -57,7 +57,7 @@ pub fn mean_squared_error(y_true: &Array, y_hat: &Array) -> f32 {
 #[cfg(test)]
 mod tests {
 
-    use prelude::*;
+    use crate::prelude::*;
 
     use super::{mean_absolute_error, mean_squared_error};
 

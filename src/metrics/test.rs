@@ -3,8 +3,8 @@
 
 mod tests {
     use super::*;
-    use metrics::ranking::*;
-    use prelude::*;
+    use crate::metrics::ranking::*;
+    use crate::prelude::*;
 
     #[test]
     fn roc_auc_test_corner_cases() {
@@ -22,7 +22,11 @@ mod tests {
     }
 }
 
+#[cfg(test)]
 mod generated_tests {
+
+    use crate::prelude::*;
+    use crate::metrics::roc_auc_score;
 
     #[test]
     fn roc_auc_test_0() {
