@@ -309,9 +309,9 @@ pub struct DecisionTree {
 
 impl<'a> SupervisedModel<&'a Array> for DecisionTree {
     fn fit(&mut self, X: &Array, y: &Array) -> Result<(), &'static str> {
-        r#try!(check_data_dimensionality(self.dim, X));
-        r#try!(check_matched_dimensions(X, y));
-        r#try!(check_valid_labels(y));
+        check_data_dimensionality(self.dim, X)?;
+        check_matched_dimensions(X, y)?;
+        check_valid_labels(y)?;
 
         self.feature_types = DecisionTree::analyze_features(X);
 
@@ -335,7 +335,7 @@ impl<'a> SupervisedModel<&'a Array> for DecisionTree {
     }
 
     fn decision_function(&self, X: &Array) -> Result<Array, &'static str> {
-        r#try!(check_data_dimensionality(self.dim, X));
+        check_data_dimensionality(self.dim, X)?;
 
         match self.root {
             Some(ref node) => {
@@ -352,9 +352,9 @@ impl<'a> SupervisedModel<&'a Array> for DecisionTree {
 
 impl<'a> SupervisedModel<&'a SparseColumnArray> for DecisionTree {
     fn fit(&mut self, X: &SparseColumnArray, y: &Array) -> Result<(), &'static str> {
-        r#try!(check_data_dimensionality(self.dim, X));
-        r#try!(check_matched_dimensions(X, y));
-        r#try!(check_valid_labels(y));
+        check_data_dimensionality(self.dim, X)?;
+        check_matched_dimensions(X, y)?;
+        check_valid_labels(y)?;
 
         self.feature_types = DecisionTree::analyze_features_sparse(X);
 
@@ -378,7 +378,7 @@ impl<'a> SupervisedModel<&'a SparseColumnArray> for DecisionTree {
     }
 
     fn decision_function(&self, X: &SparseColumnArray) -> Result<Array, &'static str> {
-        r#try!(check_data_dimensionality(self.dim, X));
+        check_data_dimensionality(self.dim, X)?;
 
         match self.root {
             Some(ref node) => {

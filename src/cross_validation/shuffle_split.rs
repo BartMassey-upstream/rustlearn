@@ -37,7 +37,6 @@ pub struct ShuffleSplit {
     iter: usize,
 }
 
-
 impl ShuffleSplit {
     /// Create a new instance of the shuffle split utility.
     ///
@@ -67,11 +66,9 @@ impl ShuffleSplit {
     }
 }
 
-
 impl Iterator for ShuffleSplit {
     type Item = (Vec<usize>, Vec<usize>);
     fn next(&mut self) -> Option<(Vec<usize>, Vec<usize>)> {
-
         let ret = if self.iter < self.n_iter {
             let split_idx: usize = (self.n as f32 * (1.0 - self.test_size)).floor() as usize;
             let shuffled_indices = self.get_shuffled_indices();
@@ -85,7 +82,6 @@ impl Iterator for ShuffleSplit {
         ret
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -107,7 +103,6 @@ mod tests {
         assert!(count == 4);
     }
 
-
     #[test]
     fn size_split() {
         let split = ShuffleSplit::new(100, 4, 0.2);
@@ -118,7 +113,6 @@ mod tests {
         }
     }
 
-
     #[test]
     #[should_panic]
     fn shuffle_differs() {
@@ -128,10 +122,8 @@ mod tests {
         assert!(set1[0].0 == set2[0].0);
     }
 
-
     #[test]
     fn set_rng() {
-
         let seed: &[_] = &[1, 2, 3, 4];
         let rng1: StdRng = SeedableRng::from_seed(seed);
         let rng2: StdRng = SeedableRng::from_seed(seed);
@@ -147,5 +139,4 @@ mod tests {
 
         assert!(set1[0].0 == set2[0].0);
     }
-
 }

@@ -35,16 +35,16 @@ pub struct CrossValidation {
     rng: StdRng,
 }
 
-
 impl CrossValidation {
     /// Create a new instance of the cross validation utility.
     ///
     /// # Panics
     /// Panics if `n_folds < n_samples` or `n_folds <= 1`.
     pub fn new(n_samples: usize, n_folds: usize) -> CrossValidation {
-
-        assert!(n_folds < n_samples,
-                "Number of folds must be smaller than number of samples");
+        assert!(
+            n_folds < n_samples,
+            "Number of folds must be smaller than number of samples"
+        );
         assert!(n_folds > 1, "Number of folds must be greater than one");
 
         let mut indices = (0..n_samples).collect::<Vec<_>>();
@@ -63,7 +63,6 @@ impl CrossValidation {
 
     /// Fix the random number generator.
     pub fn set_rng(&mut self, rng: StdRng) {
-
         self.rng = rng;
 
         self.indices = (0..self.n_samples).collect::<Vec<_>>();
@@ -71,12 +70,10 @@ impl CrossValidation {
     }
 }
 
-
 impl Iterator for CrossValidation {
     type Item = (Vec<usize>, Vec<usize>);
 
     fn next(&mut self) -> Option<(Vec<usize>, Vec<usize>)> {
-
         let ret = if self.iter < self.n_folds {
             let fold_step = self.n_samples / self.n_folds;
 
@@ -102,7 +99,6 @@ impl Iterator for CrossValidation {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -122,13 +118,11 @@ mod tests {
         assert!(count == 4);
     }
 
-
     #[test]
     fn cross_validate_size_split() {
         let split = CrossValidation::new(100, 4);
 
         for (train, test) in split {
-
             let mut set = HashSet::new();
 
             assert!(train.len() == 75);

@@ -140,7 +140,7 @@ macro_rules! impl_multiclass_supervised_model {
             fn fit(&mut self, X: &'a $t, y: &Array) -> Result<(), &'static str> {
                 for (class_label, binary_target) in OneVsRest::split(y) {
                     let model = self.get_model(class_label);
-                    r#try!(model.fit(X, &binary_target));
+                    model.fit(X, &binary_target)?;
                 }
                 Ok(())
             }
@@ -149,7 +149,7 @@ macro_rules! impl_multiclass_supervised_model {
                 let mut out = Array::zeros(X.rows(), self.class_labels.len());
 
                 for (col_idx, model) in self.models.iter().enumerate() {
-                    let values = r#try!(model.decision_function(X));
+                    let values = model.decision_function(X)?;
                     for (row_idx, &val) in values.data().iter().enumerate() {
                         *out.get_mut(row_idx, col_idx) = val;
                     }
@@ -159,7 +159,7 @@ macro_rules! impl_multiclass_supervised_model {
             }
 
             fn predict(&self, X: &'a $t) -> Result<Array, &'static str> {
-                let decision = r#try!(self.decision_function(X));
+                let decision = self.decision_function(X)?;
                 let mut predictions = Vec::with_capacity(X.rows());
 
                 for row in decision.iter_rows() {
@@ -200,23 +200,25 @@ macro_rules! impl_multiclass_parallel_predict {
                     out = crossbeam::scope(|scope| {
                         let mut guards = Vec::new();
                         for &(col_idx, model) in slc {
-                            guards.push(scope.spawn(move |_| (col_idx, model.decision_function(X))));
+                            guards
+                                .push(scope.spawn(move |_| (col_idx, model.decision_function(X))));
                         }
-
 
                         for guard in guards.into_iter() {
                             let (col_idx, res) = guard.join().unwrap();
                             if res.is_ok() {
-                                for (row_idx, &value) in res.unwrap().as_slice().iter().enumerate() {
+                                for (row_idx, &value) in res.unwrap().as_slice().iter().enumerate()
+                                {
                                     out.set(row_idx, col_idx, value);
                                 }
                             } else {
                                 return res;
                             }
                         }
-                        
+
                         Ok(out)
-                    }).unwrap()?;
+                    })
+                    .unwrap()?;
                 }
 
                 Ok(out)
@@ -227,7 +229,7 @@ macro_rules! impl_multiclass_parallel_predict {
                 X: &'a $t,
                 num_threads: usize,
             ) -> Result<Array, &'static str> {
-                let decision = r#try!(self.decision_function_parallel(X, num_threads));
+                let decision = self.decision_function_parallel(X, num_threads)?;
                 let mut predictions = Vec::with_capacity(X.rows());
 
                 for row in decision.iter_rows() {

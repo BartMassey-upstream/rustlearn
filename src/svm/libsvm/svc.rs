@@ -107,18 +107,18 @@ macro_rules! impl_supervised_model {
     ($x_type:ty) => {
         impl<'a> SupervisedModel<&'a $x_type> for SVC {
             fn fit(&mut self, X: &$x_type, y: &Array) -> Result<(), &'static str> {
-                r#try!(check_data_dimensionality(self.dim, X));
-                r#try!(check_matched_dimensions(X, y));
+                check_data_dimensionality(self.dim, X)?;
+                check_matched_dimensions(X, y)?;
 
                 let svm_params = self.hyperparams.svm_parameter();
 
-                self.model = Some(r#try!(ffi::fit(X, y, &svm_params)));
+                self.model = Some(ffi::fit(X, y, &svm_params)?);
 
                 Ok(())
             }
 
             fn decision_function(&self, X: &$x_type) -> Result<Array, &'static str> {
-                r#try!(check_data_dimensionality(self.dim, X));
+                check_data_dimensionality(self.dim, X)?;
 
                 match self.model {
                     Some(ref model) => {

@@ -1,10 +1,9 @@
 //! Ranking accuracy metrics.
 
-use std::f32;
 use std::cmp::{min, Ordering};
+use std::f32;
 
 use crate::array::prelude::*;
-
 
 /// Discounted Cumulative Gain
 ///
@@ -38,7 +37,6 @@ pub fn ndcg_score(y_true: &Array, y_hat: &Array, k: i32) -> f32 {
 
 /// Return (nondecreasing) counts of true positives and false positives.
 fn counts_at_score(y_true: &[f32], y_hat: &[f32]) -> (Vec<f32>, Vec<f32>) {
-
     // vector of pairs (score, label) - the order is switched with respect to function arguments
     let mut pairs: Vec<_> = y_hat.iter().cloned().zip(y_true.iter().cloned()).collect();
 
@@ -68,18 +66,18 @@ fn counts_at_score(y_true: &[f32], y_hat: &[f32]) -> (Vec<f32>, Vec<f32>) {
     (tps, fps)
 }
 
-
 /// Calculate true positive and false positive rates.
 /// Both vectors are nondecreasing.
 fn rates_at_score(y_true: &[f32], y_hat: &[f32]) -> (Vec<f32>, Vec<f32>) {
-
     let (mut true_positive_count, mut false_positive_count) = counts_at_score(y_true, y_hat);
 
     let true_positives = true_positive_count[true_positive_count.len() - 1];
     let false_positives = false_positive_count[false_positive_count.len() - 1];
 
-    for (tp, fp) in true_positive_count.iter_mut()
-        .zip(false_positive_count.iter_mut()) {
+    for (tp, fp) in true_positive_count
+        .iter_mut()
+        .zip(false_positive_count.iter_mut())
+    {
         *tp /= true_positives;
         *fp /= false_positives;
     }
@@ -87,17 +85,14 @@ fn rates_at_score(y_true: &[f32], y_hat: &[f32]) -> (Vec<f32>, Vec<f32>) {
     (true_positive_count, false_positive_count)
 }
 
-
 /// Integration using the trapezoidal rule.
 fn trapezoidal(x: &[f32], y: &[f32]) -> f32 {
-
     let mut prev_x = *x.first().unwrap();
     let mut prev_y = *y.first().unwrap();
 
     let mut integral = 0.0;
 
     for (&x, &y) in x.iter().skip(1).zip(y.iter().skip(1)) {
-
         integral += (x - prev_x) * (prev_y + y) / 2.0;
 
         prev_x = x;
@@ -107,9 +102,7 @@ fn trapezoidal(x: &[f32], y: &[f32]) -> f32 {
     integral
 }
 
-
 fn check_roc_auc_inputs(y_true: &Array, y_hat: &Array) -> Result<(), &'static str> {
-
     if y_true.cols() != 1 || y_hat.cols() != 1 {
         return Err("Input array has more than one column.");
     }
@@ -144,7 +137,6 @@ fn check_roc_auc_inputs(y_true: &Array, y_hat: &Array) -> Result<(), &'static st
     Ok(())
 }
 
-
 /// Compute the ROC AUC score for a binary classification problem.
 ///
 /// # Failures
@@ -154,22 +146,19 @@ fn check_roc_auc_inputs(y_true: &Array, y_hat: &Array) -> Result<(), &'static st
 /// - both classes are not represented in the input
 /// - inputs are empty
 pub fn roc_auc_score(y_true: &Array, y_hat: &Array) -> Result<f32, &'static str> {
-
-    r#try!(check_roc_auc_inputs(y_true, y_hat));
+    check_roc_auc_inputs(y_true, y_hat)?;
 
     let (tpr, fpr) = rates_at_score(y_true.data(), y_hat.data());
 
     Ok(trapezoidal(&fpr, &tpr))
 }
 
-
-
 #[cfg(test)]
 mod tests {
 
     use prelude::*;
 
-    use super::{counts_at_score, roc_auc_score, dcg_score, ndcg_score};
+    use super::{counts_at_score, dcg_score, ndcg_score, roc_auc_score};
 
     #[test]
     fn basic() {
@@ -184,8 +173,10 @@ mod tests {
         assert!(allclose(&Array::from(x), &Array::from(x_expected)));
         assert!(allclose(&Array::from(y), &Array::from(y_expected)));
 
-        assert!(close(0.75,
-                      roc_auc_score(&Array::from(y_true), &Array::from(y_hat)).unwrap()));
+        assert!(close(
+            0.75,
+            roc_auc_score(&Array::from(y_true), &Array::from(y_hat)).unwrap()
+        ));
     }
 
     #[test]
@@ -225,7 +216,9 @@ mod tests {
         let y_true = vec![1.0, 1.0, 0.0, 0.0];
         let y_hat = vec![0.5, 0.5, -1.0, 0.5];
 
-        assert!(close(0.75,
-                      roc_auc_score(&Array::from(y_true), &Array::from(y_hat)).unwrap()));
+        assert!(close(
+            0.75,
+            roc_auc_score(&Array::from(y_true), &Array::from(y_hat)).unwrap()
+        ));
     }
 }

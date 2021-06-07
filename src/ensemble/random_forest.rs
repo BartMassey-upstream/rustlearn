@@ -38,8 +38,8 @@ use crate::trees::decision_tree;
 use crate::multiclass::OneVsRestWrapper;
 use crate::utils::EncodableRng;
 
-use rand::prelude::*;
 use rand::distributions::Uniform;
+use rand::prelude::*;
 
 #[derive(Serialize, Deserialize)]
 pub struct Hyperparameters {
@@ -115,7 +115,7 @@ impl<'a> SupervisedModel<&'a Array> for RandomForest {
 
         for tree in &mut self.trees {
             let indices = RandomForest::bootstrap_indices(X.rows(), &mut rng.rng);
-            r#try!(tree.fit(&X.get_rows(&indices), &y.get_rows(&indices)));
+            tree.fit(&X.get_rows(&indices), &y.get_rows(&indices))?;
         }
 
         self.rng = rng;
@@ -127,7 +127,7 @@ impl<'a> SupervisedModel<&'a Array> for RandomForest {
         let mut df = Array::zeros(X.rows(), 1);
 
         for tree in &self.trees {
-            df.add_inplace(&r#try!(tree.decision_function(X)));
+            df.add_inplace(&tree.decision_function(X)?);
         }
 
         df.div_inplace(self.trees.len() as f32);
@@ -143,7 +143,7 @@ impl<'a> SupervisedModel<&'a SparseRowArray> for RandomForest {
         for tree in &mut self.trees {
             let indices = RandomForest::bootstrap_indices(X.rows(), &mut rng.rng);
             let x = SparseColumnArray::from(&X.get_rows(&indices));
-            r#try!(tree.fit(&x, &y.get_rows(&indices)));
+            tree.fit(&x, &y.get_rows(&indices))?;
         }
 
         self.rng = rng;
@@ -157,7 +157,7 @@ impl<'a> SupervisedModel<&'a SparseRowArray> for RandomForest {
         let x = SparseColumnArray::from(X);
 
         for tree in &self.trees {
-            df.add_inplace(&r#try!(tree.decision_function(&x)));
+            df.add_inplace(&tree.decision_function(&x)?);
         }
 
         df.div_inplace(self.trees.len() as f32);
@@ -422,5 +422,4 @@ mod tests {
 
         assert!(test_accuracy > 0.96);
     }
-
 }

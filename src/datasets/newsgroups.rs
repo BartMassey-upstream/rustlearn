@@ -4,12 +4,11 @@
 
 use csv;
 
-use prelude::*;
 use feature_extraction::dict_vectorizer::*;
+use prelude::*;
 
 /// Load the newsgroups dataset.
 pub fn load_data() -> (SparseRowArray, Array) {
-
     let mut rdr = csv::Reader::from_file("./test_data/newsgroups/data.csv")
         .unwrap()
         .has_headers(false);

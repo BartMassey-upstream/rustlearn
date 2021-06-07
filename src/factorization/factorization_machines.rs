@@ -157,8 +157,7 @@ impl Hyperparameters {
     /// Initialize the latent factors.
     fn init_latent_factors_array(&self, rng: &mut EncodableRng) -> Array {
         let mut data = Vec::with_capacity(self.dim * self.num_components);
-        let normal =
-            rand_distr::Normal::new(0.0, 1.0 / self.num_components as f64).unwrap();
+        let normal = rand_distr::Normal::new(0.0, 1.0 / self.num_components as f64).unwrap();
 
         for _ in 0..(self.dim * self.num_components) {
             data.push(normal.sample(&mut rng.rng) as f32)
@@ -288,8 +287,7 @@ impl FactorizationMachine {
             let slice_start = feature_idx * self.num_components;
             let slice_stop = slice_start + self.num_components;
 
-            let component_row =
-                &mut self.latent_factors.as_mut_slice()[slice_start..slice_stop];
+            let component_row = &mut self.latent_factors.as_mut_slice()[slice_start..slice_stop];
             let gradsq_row = &mut self.latent_gradsq.as_mut_slice()[slice_start..slice_stop];
             let applied_l2_row =
                 &mut self.latent_applied_l2.as_mut_slice()[slice_start..slice_stop];
@@ -303,10 +301,12 @@ impl FactorizationMachine {
                             .iter_mut()
                             .zip(applied_l1_row.iter_mut().zip(component_sum.iter())),
                     ),
-                ) {
+                )
+            {
                 let local_learning_rate = self.learning_rate / gradsq.sqrt();
-                let update = loss * ((component_sum_value * feature_value)
-                    - (*component_value * feature_value.powi(2)));
+                let update = loss
+                    * ((component_sum_value * feature_value)
+                        - (*component_value * feature_value.powi(2)));
 
                 *component_value -= local_learning_rate * update;
                 *gradsq += update.powi(2);
@@ -384,15 +384,15 @@ where
     T: IndexableMatrix,
 {
     fn fit(&mut self, X: &'a T, y: &Array) -> Result<(), &'static str> {
-        r#try!(check_data_dimensionality(self.dim, X));
-        r#try!(check_matched_dimensions(X, y));
-        r#try!(check_valid_labels(y));
+        check_data_dimensionality(self.dim, X)?;
+        check_matched_dimensions(X, y)?;
+        check_valid_labels(y)?;
 
         self.fit_sigmoid(X, y)
     }
 
     fn decision_function(&self, X: &'a T) -> Result<Array, &'static str> {
-        r#try!(check_data_dimensionality(self.dim, X));
+        check_data_dimensionality(self.dim, X)?;
 
         let mut data = Vec::with_capacity(X.rows());
 
@@ -418,9 +418,9 @@ where
         y: &Array,
         num_threads: usize,
     ) -> Result<(), &'static str> {
-        r#try!(check_data_dimensionality(self.dim, X));
-        r#try!(check_matched_dimensions(X, y));
-        r#try!(check_valid_labels(y));
+        check_data_dimensionality(self.dim, X)?;
+        check_matched_dimensions(X, y)?;
+        check_valid_labels(y)?;
 
         let rows_per_thread = X.rows() / num_threads + 1;
         let num_components = self.num_components;

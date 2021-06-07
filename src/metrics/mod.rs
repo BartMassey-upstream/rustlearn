@@ -6,15 +6,13 @@ mod ranking;
 
 mod test;
 
-pub use self::ranking::{roc_auc_score, dcg_score, ndcg_score};
-
+pub use self::ranking::{dcg_score, ndcg_score, roc_auc_score};
 
 /// Measure classifier accuracy
 ///
 /// # Panics
 /// Will panic if inputs are of unequal length.
 pub fn accuracy_score(y_true: &Array, y_hat: &Array) -> f32 {
-
     assert!(y_true.rows() == y_hat.rows());
 
     let mut accuracy = 0.0;
@@ -56,7 +54,6 @@ pub fn mean_squared_error(y_true: &Array, y_hat: &Array) -> f32 {
     sq_diff / (y_true.rows() as f32)
 }
 
-
 #[cfg(test)]
 mod tests {
 
@@ -69,10 +66,8 @@ mod tests {
         let y_true = &Array::from(vec![1.0, 1.0, 0.0, 0.0]);
 
         let mae = mean_absolute_error(y_true, y_true);
-        assert!(mae==0.0);
+        assert!(mae == 0.0);
         let mse = mean_squared_error(y_true, y_true);
-        assert!(mse==0.0);
-
+        assert!(mse == 0.0);
     }
-
 }
