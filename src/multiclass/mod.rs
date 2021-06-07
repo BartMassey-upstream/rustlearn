@@ -295,7 +295,7 @@ macro_rules! impl_multiclass_parallel_supervised {
                         }
 
                         Ok(())
-                    });
+                    }).unwrap()?;
                 }
 
                 Ok(())

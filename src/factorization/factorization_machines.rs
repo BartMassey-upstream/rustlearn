@@ -451,7 +451,7 @@ where
                     }
                 });
             }
-        });
+        }).unwrap();
 
         self.regularize_all();
 

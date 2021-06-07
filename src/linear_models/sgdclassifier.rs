@@ -172,6 +172,7 @@ fn logistic_loss(y: f32, y_hat: f32) -> f32 {
     y_hat - y
 }
 
+/*
 macro_rules! adagrad_updates {
     ($coefficients:expr, $x:expr, $gradsq:expr) => {{
         $coefficients
@@ -180,6 +181,7 @@ macro_rules! adagrad_updates {
             .zip(($gradsq.iter_mut()))
     }};
 }
+*/
 
 macro_rules! max {
     ($x:expr, $y:expr) => {{
@@ -261,7 +263,7 @@ impl<'a> ParallelPredict<&'a Array> for SGDClassifier {
                     }
                 });
             }
-        });
+        }).unwrap();
 
         Ok(Array::from(data))
     }

@@ -119,14 +119,12 @@ fn check_roc_auc_inputs(y_true: &Array, y_hat: &Array) -> Result<(), &'static st
     let mut neg_present = false;
 
     for &y in y_true.data() {
-        match y {
-            0.0 => {
-                neg_present = true;
-            }
-            1.0 => {
-                pos_present = true;
-            }
-            _ => return Err("Invalid labels: target data is not either 0.0 or 1.0"),
+        if y == 0.0 {
+            neg_present = true;
+        } else if y == 1.0 {
+            pos_present = true;
+        } else {
+            return Err("Invalid labels: target data is not either 0.0 or 1.0");
         }
     }
 

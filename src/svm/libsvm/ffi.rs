@@ -13,6 +13,7 @@ use std::slice;
 use crate::prelude::*;
 
 /// SVM type.
+#[allow(non_camel_case_types)]
 #[repr(C)]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum SvmType {
